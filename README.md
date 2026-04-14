@@ -29,6 +29,35 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+The features that are being used in the system would mainly be the genre, mood, energy, acoustics, and valence. The information that UserProfile would store should be all of the relevant metadata of the attributes of songs they have listened to or preferred. This gives an object of comparison for when the system can recommend other songs by similar users or content-based. The recommender can compute the score for each song based on the similaries to all of the features of the songs mentioned. A higher prioritized feature will have a higher impact on the score. Thus, the songs recommended can be based off of this scoring system.
+
+```mermaid
+flowchart TD
+    A([User Preferences\nfavorite_genre · favorite_mood\ntarget_energy · target_valence · likes_acoustic]) --> C
+
+    B[(songs.csv\n20 songs)] --> C[Load all songs into memory]
+
+    C --> D{More songs\nto score?}
+
+    D -- Yes: pick next song --> E[Read one Song row\ntitle · genre · mood\nenergy · valence · acousticness]
+
+    E --> F[Score categorical fields\n+3 if genre matches\n+2 if mood matches]
+    F --> G[Score numeric fields\nenergy similarity × 1.5\nvalence similarity × 1.0]
+    G --> H[Score acoustic preference\n+1 if likes_acoustic\nand acousticness > 0.6]
+
+    H --> I[Sum all points\ninto total score\nCollect match reasons]
+
+    I --> J[(Scored list\nsong · score · reasons)]
+
+    J --> D
+
+    D -- No more songs --> K[Sort scored list\nby score descending]
+
+    K --> L[Slice top K entries]
+
+    L --> M([Ranked Recommendations\n1st · 2nd · 3rd · ... K\neach with score + explanation])
+```
+
 ---
 
 ## Getting Started
@@ -209,3 +238,34 @@ A few sentences about what you learned:
 - How did building this change how you think about real music recommenders
 - Where do you think human judgment still matters, even if the model seems "smart"
 
+## 10. DEMO OUTPUT
+========================================
+  Top 5 Recommendations
+========================================
+
+#1  Sunrise City by Neon Echo
+    Score : 6.47 / 9.50
+    Genre : pop  |  Mood: happy
+    Why   : genre match (+3.0), mood match (+2.0), energy similarity (+1.47)
+
+#2  Gym Hero by Max Pulse
+    Score : 4.30 / 9.50
+    Genre : pop  |  Mood: intense
+    Why   : genre match (+3.0), energy similarity (+1.30)
+
+#3  Rooftop Lights by Indigo Parade
+    Score : 3.44 / 9.50
+    Genre : indie pop  |  Mood: happy
+    Why   : mood match (+2.0), energy similarity (+1.44)
+
+#4  Crown Moves by Street Cipher
+    Score : 1.47 / 9.50
+    Genre : hip-hop  |  Mood: confident
+    Why   : energy similarity (+1.47)
+
+#5  Night Drive Loop by Neon Echo
+    Score : 1.42 / 9.50
+    Genre : synthwave  |  Mood: moody
+    Why   : energy similarity (+1.42)
+
+========================================
